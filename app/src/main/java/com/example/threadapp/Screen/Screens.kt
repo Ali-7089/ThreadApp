@@ -7,5 +7,7 @@ sealed class Screens(val route:String){
     object Search:Screens("search")
     object AddThread:Screens("add-thread")
     object Splash:Screens("splash")
-    object BottomNavigation :Screens("bottom-navigation")
+    object SignIn :Screens("sign-in")
+    object SignUp :Screens("sign-up")
+
 }

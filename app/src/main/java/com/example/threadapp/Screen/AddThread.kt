@@ -15,7 +15,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 
 @Composable
-fun search(navController: NavController) {
+fun addThread(navController: NavController) {
     Scaffold(
         bottomBar = {myBottomBar(navController)}
     ){
@@ -23,5 +23,5 @@ fun search(navController: NavController) {
 
         }
     }
-    Text(text = "search")
+    Text(text = "Add thread")
 }

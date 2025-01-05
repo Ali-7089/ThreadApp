@@ -5,10 +5,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.threadapp.Screen.Screens
+import com.example.threadapp.Screen.addThread
 import com.example.threadapp.Screen.bottomNavigation
 import com.example.threadapp.Screen.home
+import com.example.threadapp.Screen.login
 import com.example.threadapp.Screen.notification
 import com.example.threadapp.Screen.profle
+import com.example.threadapp.Screen.register
 import com.example.threadapp.Screen.search
 import com.example.threadapp.Screen.splash
 
@@ -20,9 +23,6 @@ fun navigation(){
        composable(Screens.Splash.route){
            splash(navController = navController)
        }
-        composable(Screens.BottomNavigation.route){
-             bottomNavigation(navController)
-        }
         composable(Screens.Home.route){
            home(navController = navController)
         }
@@ -36,7 +36,13 @@ fun navigation(){
             search(navController = navController)
         }
         composable(Screens.AddThread.route){
-
+            addThread(navController)
+        }
+        composable(Screens.SignIn.route){
+           login(navController)
+        }
+        composable(Screens.SignUp.route){
+            register(navController)
         }
         
     }

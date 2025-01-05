@@ -3,6 +3,9 @@ package com.example.threadapp.Screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,6 +16,12 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun notification(navController: NavController) {
-    
+    Scaffold(
+        bottomBar = {myBottomBar(navController)}
+    ){
+        LazyColumn(modifier= Modifier.padding(it)){
+
+        }
+    }
     Text(text = "notification")
 }
