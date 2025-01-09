@@ -1,6 +1,8 @@
 package com.example.threadapp.Navigation
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -39,7 +41,10 @@ fun navigation(){
             addThread(navController)
         }
         composable(Screens.SignIn.route){
-           login(navController)
+            val activity = LocalContext.current as? Activity
+           login(navController){
+                activity?.finish()
+           }
         }
         composable(Screens.SignUp.route){
             register(navController)

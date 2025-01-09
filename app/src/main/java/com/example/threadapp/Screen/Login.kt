@@ -1,7 +1,10 @@
 package com.example.threadapp.Screen
 
+import android.app.Activity
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,24 +25,45 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import kotlinx.coroutines.delay
+
 
 @Composable
-fun login(navController: NavController) {
+fun login(navController: NavController, onCloseApp: ()->Unit) {
+    val swipeThreshold = 200f // Minimum distance for swipe detection
+    var offsetX by remember { mutableStateOf(0f) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures { change, dragAmount ->
+                    println("is it working")
+                    // Update the horizontal offset based on drag
+//                    offsetX += dragAmount
+//                    change.consume()
+//                    println("chla tha")
+                    // If swipe distance exceeds the threshold, close the app
+                    if (dragAmount > 50) {
+                        println("chla tha..")
+                        onCloseApp()
+                    }
+                }
+            },
+
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
+
+
+
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
         Text("Login",

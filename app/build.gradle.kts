@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.threadapp"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -51,6 +51,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.androidx.compose.material)
     val nav_version = "2.8.5"
 
     implementation("androidx.navigation:navigation-compose:$nav_version")
@@ -62,6 +64,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-database")
 
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
