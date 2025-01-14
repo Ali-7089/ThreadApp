@@ -3,6 +3,7 @@ package com.example.threadapp.Navigation
 import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -16,10 +17,12 @@ import com.example.threadapp.Screen.profle
 import com.example.threadapp.Screen.register
 import com.example.threadapp.Screen.search
 import com.example.threadapp.Screen.splash
+import com.example.threadapp.ViewModel.AuthViewModel
 
 @Composable
 fun navigation(){
     val navController = rememberNavController();
+    val authViewModel:AuthViewModel = viewModel()
     NavHost(navController = navController,
         startDestination = Screens.Splash.route) {
        composable(Screens.Splash.route){
@@ -47,7 +50,7 @@ fun navigation(){
            }
         }
         composable(Screens.SignUp.route){
-            register(navController)
+            register(navController,authViewModel)
         }
         
     }

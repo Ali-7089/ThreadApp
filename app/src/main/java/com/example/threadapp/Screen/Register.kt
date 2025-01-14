@@ -1,5 +1,6 @@
 package com.example.threadapp.Screen
 
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -31,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -38,88 +40,110 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import com.example.threadapp.Manifest
 import kotlinx.coroutines.delay
 import com.example.threadapp.R
+import android.Manifest
+import android.widget.Toast
+import androidx.compose.runtime.livedata.observeAsState
+import coil3.compose.rememberAsyncImagePainter
+import com.example.threadapp.ViewModel.AuthViewModel
 
 @Composable
-fun register(navController: NavController) {
+fun register(navController: NavController, authViewModel: AuthViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
-    ){
+    ) {
         var name by remember { mutableStateOf("") }
         var username by remember { mutableStateOf("") }
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
-        var image by remember { mutableStateOf<Uri?>(null)}
+        var imageRef by remember { mutableStateOf<Uri?>(null) }
+        var context = LocalContext.current
+        var firebaseUser = authViewModel.firebaseUser.observeAsState(null)
 
-       val requestToPermission = if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU){
-           android.Manifest.permission.READ_MEDIA_IMAGES
-       }else{
-           android.Manifest.permission.READ_EXTERNAL_STORAGE
-       }
+        val requestToPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
 
-       var laucher =
-           rememberLauncherForActivityResult(contract =ActivityResultContracts.GetContent()) {
+        var laucher =
+            rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
+                imageRef = uri
+            }
 
-       }
-
-       //permissionLauncher
+        //permissionLauncher
         var permissionLauncher =
-            rememberLauncherForActivityResult(contract =ActivityResultContracts.RequestPermission()) {
-            isGranted :Boolean ->
-                if (isGranted){
+            rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+                if (isGranted) {
 
-                }else{
+                } else {
 
                 }
 
-        }
+            }
 
 
-        Text("Register",
+        Text(
+            "Register",
             style = TextStyle(
                 fontSize = 30.sp
             )
-            )
+        )
         Spacer(modifier = Modifier.height(15.dp))
-        Image(painter = painterResource(id =R.drawable.profile_image ),
+        Image(
+            painter = if (imageRef == null) painterResource(id = R.drawable.profile_image)
+            else rememberAsyncImagePainter(model = imageRef),
             modifier = Modifier
                 .size(80.dp)
                 .clip(CircleShape)
                 .clickable {
+                    var isGranted = ContextCompat.checkSelfPermission(
+                        context,
+                        requestToPermission
+                    ) == PackageManager.PERMISSION_GRANTED
 
+                    if (isGranted) {
+                        laucher.launch("image/*")
+                    } else {
+                        permissionLauncher.launch(requestToPermission)
+                    }
                 },
             contentScale = ContentScale.Crop,
-            contentDescription =null)
+            contentDescription = null
+        )
 
         Spacer(modifier = Modifier.height(15.dp))
 
 
-        OutlinedTextField(value = name,
-            onValueChange = {name = it},
-            label = { Text("Enter name...")},
+        OutlinedTextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Enter name...") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
             singleLine = true,
         )
-        OutlinedTextField(value = username,
-            onValueChange = {username = it},
-            label = { Text("Enter username...")},
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Enter username...") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
             singleLine = true,
         )
-        OutlinedTextField(value = email,
-            onValueChange = {email = it},
-            label = { Text("Enter email...")},
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Enter email...") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
@@ -129,9 +153,10 @@ fun register(navController: NavController) {
             )
         )
         Spacer(modifier = Modifier.height(15.dp))
-        OutlinedTextField(value = password,
-            onValueChange = {password = it},
-            label = { Text("Enter password...")},
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Enter password...") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,7 +164,16 @@ fun register(navController: NavController) {
             singleLine = true
         )
 
-        Button(onClick = { /*TODO*/ }) {
+        Button(onClick = {
+             if(name.isEmpty() || username.isEmpty()|| email.isEmpty()|| password.isEmpty()){
+                 Toast.makeText(context,"Fill the details completely!!" , Toast.LENGTH_LONG).show()
+             }else{
+                 authViewModel.register(email, password, name, username,context)
+                 if (firebaseUser != null){
+                     navController.navigate(Screens.Home.route)
+                 }
+             }
+        }) {
             Text("submit")
         }
         Spacer(modifier = Modifier.height(15.dp))
@@ -148,7 +182,7 @@ fun register(navController: NavController) {
                 fontSize = 15.sp
             ),
             modifier = Modifier.clickable {
-                navController.navigate(Screens.SignIn.route){
+                navController.navigate(Screens.SignIn.route) {
                     popUpTo(navController.graph.startDestinationId)
                     launchSingleTop = true
                 }
