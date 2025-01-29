@@ -32,6 +32,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.sourceInformation
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil3.compose.rememberAsyncImagePainter
@@ -60,7 +61,8 @@ fun home(
     navController: NavController,
     homeViewModel: HomeViewModel
 ) {
-    val threadAndUser by homeViewModel.threadAndUser.observeAsState(emptyList())
+    val threadAndUser by homeViewModel.threadAndUser.observeAsState(null)
+    println(threadAndUser)
     Scaffold(
         bottomBar = { myBottomBar(navController) }
     ) {
@@ -82,7 +84,6 @@ fun home(
                 .padding(top = 60.dp)
         ) {
             items(threadAndUser ?: emptyList()) { pair ->
-                println("yaha tk aaya")
                 threadItem(pair.first, pair.second)
             }
         }
@@ -130,7 +131,7 @@ fun threadItem(threadData: ThreadData, user: User) {
                     )
                 }
                 Text(
-                    text = threadData.timestamp,
+                    text = timestampToReadableTime(threadData.timestamp),
                     fontSize = 12.sp,
                     color = Color.Gray,
                     modifier = Modifier
