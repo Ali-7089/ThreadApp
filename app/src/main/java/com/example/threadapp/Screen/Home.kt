@@ -35,7 +35,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.sourceInformation
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import coil3.compose.rememberAsyncImagePainter
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.threadapp.Model.User
 import com.example.threadapp.ViewModel.HomeViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -114,9 +116,11 @@ fun threadItem(threadData: ThreadData, user: User) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Profile Picture
-                    Image(
-                        painter = rememberAsyncImagePainter(model = user.imgUrl),
-                        contentDescription = "Profile Picture",
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(user.imgUrl).build(),
+                        contentDescription = "Profile Image",
+                        placeholder = painterResource(id = R.drawable.profile_image),
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape),
@@ -152,9 +156,11 @@ fun threadItem(threadData: ThreadData, user: User) {
 
             // Conditionally load the post image if it exists
             if(threadData.imgUrl != ""){
-                Image(
-                    painter = rememberAsyncImagePainter(model = threadData.imgUrl),
-                    contentDescription = "Post Image",
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(threadData.imgUrl).build(),
+                    contentDescription = "Profile Image",
+                    placeholder = painterResource(id = R.drawable.profile_image),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)

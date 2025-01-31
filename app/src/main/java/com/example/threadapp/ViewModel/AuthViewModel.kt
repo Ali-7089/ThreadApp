@@ -13,6 +13,8 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class AuthViewModel : ViewModel() {
     var auth = FirebaseAuth.getInstance()
@@ -85,6 +87,13 @@ class AuthViewModel : ViewModel() {
         context: Context
     ) {
         val userObject = User(name, username, email, password, uid,imgUrl)
+
+        val db = Firebase.firestore
+        val followers = db.collection("Followers").document(uid!!)
+        val following = db.collection("Following").document(uid!!)
+
+        followers.set(mapOf("followings_id" to listOf<String>()))
+        following.set(mapOf("followers_id" to listOf<String>()))
 
         userRef.child(uid!!).setValue(userObject)
             .addOnSuccessListener {

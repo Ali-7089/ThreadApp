@@ -43,7 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import coil3.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.threadapp.ImageUploading.uploadImageToCloudinary
 import com.example.threadapp.Model.SharedPref
 import com.example.threadapp.R
@@ -113,10 +114,11 @@ fun addThread(
             verticalAlignment = Alignment.CenterVertically
         ) {
             println("image " + SharedPref.getImage(context))
-            Image(
-                painter = if (profileImg.isEmpty()) painterResource(id = R.drawable.profile_image)
-                else rememberAsyncImagePainter("https://res.cloudinary.com/dixcja6yr/image/upload/v1737797829/pp958hafeceezmj5ji4o.jpg"),
-                contentDescription = null,
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(SharedPref.getImage(context)).build(),
+                contentDescription = "Profile Image",
+                placeholder = painterResource(id = R.drawable.profile_image),
                 modifier = Modifier
                     .size(75.dp)
                     .clip(CircleShape),
@@ -155,13 +157,14 @@ fun addThread(
             )
         }
         Spacer(modifier = Modifier.height(15.dp))
-        Image( painter = if(imageRef ==null) painterResource(id =R.drawable.profile_image )
-            else rememberAsyncImagePainter(model = imageRef),
-            contentDescription = null,
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageRef).build(),
+            contentDescription = "Profile Image",
+            placeholder = painterResource(id = R.drawable.profile_image),
              modifier = Modifier
                  .fillMaxWidth()
                  .height(300.dp)
-                 .background(Color.Blue)
             )
 
         Spacer(modifier = Modifier.height(15.dp))

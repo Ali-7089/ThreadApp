@@ -31,6 +31,7 @@ class SearchViewModel:ViewModel() {
     init {
         viewModelScope.launch {
             fetchUser()
+            println("users "+ _userData)
         }
     }
 

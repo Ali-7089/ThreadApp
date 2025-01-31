@@ -9,5 +9,6 @@ sealed class Screens(val route:String){
     object Splash:Screens("splash")
     object SignIn :Screens("sign-in")
     object SignUp :Screens("sign-up")
+    object OtherProfile :Screens("other-profile")
 
 }

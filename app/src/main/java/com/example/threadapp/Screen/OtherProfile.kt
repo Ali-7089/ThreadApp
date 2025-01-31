@@ -38,36 +38,40 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.threadapp.Model.SharedPref
 import com.example.threadapp.Model.ThreadData
+import com.example.threadapp.Model.User
 import com.example.threadapp.R
 import com.example.threadapp.ViewModel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(
+ fun OtherProfileScreen(
     navController: NavController,
     authViewModel: AuthViewModel,
-    userViewModel: UserViewModel
+    userViewModel: UserViewModel,
+    userId:String
 ) {
      val allThreads by userViewModel.threadData.observeAsState(emptyList())
+    val userData by userViewModel.userData.observeAsState(null)
+    LaunchedEffect(true) {
+        userId?.let {
+            userViewModel.fetchUser(userId)
+        }
+        FirebaseAuth.getInstance()?.currentUser?.uid?.let {
+            userViewModel.fetchThread(userId)
+        }
+    }
 
-      LaunchedEffect(true) {
-          FirebaseAuth.getInstance()?.currentUser?.uid?.let {
-              userViewModel.fetchThread(FirebaseAuth.getInstance()?.currentUser?.uid.toString())
-          }
-      }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
 
-        ProfileHeader(authViewModel,navController)
+       if(userData!=null) OtherProfileHeader(authViewModel,navController,userData!!)
 
         Scaffold(
             bottomBar = { myBottomBar(navController) }
@@ -89,8 +93,10 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileHeader(authViewModel: AuthViewModel,
-                  navController:NavController) {
+fun OtherProfileHeader(authViewModel: AuthViewModel,
+                  navController:NavController,
+                       user: User
+                       ) {
     var firebaseUser = authViewModel.firebaseUser.observeAsState()
      var context = LocalContext.current
     Column(
@@ -110,7 +116,7 @@ fun ProfileHeader(authViewModel: AuthViewModel,
             contentScale = ContentScale.Crop
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = SharedPref.getName(context), fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(text = user.name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = "Android developer", fontSize = 14.sp, color = Color.Gray)
         Spacer(modifier = Modifier.height(8.dp))
@@ -141,19 +147,16 @@ fun ProfileHeader(authViewModel: AuthViewModel,
         // Logout Button
         Button(
             onClick = {
-                authViewModel.logOut()
-                if (firebaseUser.value == null){
-                    println(firebaseUser.value)
-                    navController.navigate(Screens.SignIn.route)
-                }},
+
+               },
         ) {
-            Text(text = "Logout", color = Color.White, fontSize = 16.sp)
+            Text(text = "Follow", color = Color.White, fontSize = 16.sp)
         }
     }
 }
 
 @Composable
-fun PostItem(threadData: ThreadData) {
+fun OtherPostItem(threadData: ThreadData) {
     Card(
         modifier = Modifier
             .fillMaxWidth()

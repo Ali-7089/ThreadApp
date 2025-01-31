@@ -8,13 +8,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.threadapp.Model.User
+import com.example.threadapp.Screen.OtherProfileScreen
 import com.example.threadapp.Screen.ProfileScreen
 import com.example.threadapp.Screen.Screens
 import com.example.threadapp.Screen.addThread
 import com.example.threadapp.Screen.home
 import com.example.threadapp.Screen.login
 import com.example.threadapp.Screen.notification
-//import com.example.threadapp.Screen.profle
 import com.example.threadapp.Screen.register
 import com.example.threadapp.Screen.search
 import com.example.threadapp.Screen.splash
@@ -60,6 +60,18 @@ fun navigation(){
         composable(Screens.SignUp.route){
             register(navController,authViewModel)
         }
-        
+        composable(Screens.OtherProfile.route+"/{id}"){
+            var id = it.arguments!!.get("id").toString()
+            println("id"+ id)
+            id?.let {
+                OtherProfileScreen(navController = navController,
+                    authViewModel =authViewModel ,
+                    userViewModel = userViewModel,
+                    id
+                )
+            }
+
+        }
+
     }
 }

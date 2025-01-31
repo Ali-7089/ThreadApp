@@ -47,7 +47,8 @@ import com.example.threadapp.R
 import android.Manifest
 import android.widget.Toast
 import androidx.compose.runtime.livedata.observeAsState
-import coil3.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.threadapp.ImageUploading.uploadImageToCloudinary
 import com.example.threadapp.ViewModel.AuthViewModel
 
@@ -101,11 +102,11 @@ fun register(navController: NavController, authViewModel: AuthViewModel) {
             )
         )
         Spacer(modifier = Modifier.height(15.dp))
-        Image(
-            painter = if (imageRef == null) painterResource(id = R.drawable.profile_image)
-            else {
-                rememberAsyncImagePainter(model = imageRef)
-            },
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageRef).crossfade(true).build(),
+            contentDescription = "Profile Image",
+            placeholder = painterResource(id = R.drawable.profile_image),
             modifier = Modifier
                 .size(80.dp)
                 .clip(CircleShape)
@@ -122,7 +123,6 @@ fun register(navController: NavController, authViewModel: AuthViewModel) {
                     }
                 },
             contentScale = ContentScale.Crop,
-            contentDescription = null
         )
 
         Spacer(modifier = Modifier.height(15.dp))

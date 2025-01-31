@@ -23,13 +23,28 @@ import kotlinx.coroutines.withContext
 class UserViewModel : ViewModel() {
     var db = FirebaseDatabase.getInstance()
     var threads = db.getReference("threads")
+    var users = db.getReference("users")
 
     private var _threadData = MutableLiveData<List<ThreadData>>()
     var threadData: LiveData<List<ThreadData>> = _threadData
-    init {
-        viewModelScope.launch {
-            FirebaseAuth.getInstance()?.currentUser?.uid?.let { fetchThread(it) }
-        }
+
+    private var _userData = MutableLiveData<User>()
+    var userData: LiveData<User> = _userData
+
+    fun fetchUser(userId:String){
+        users.child(userId).addListenerForSingleValueEvent(object :ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val data = snapshot.getValue(User::class.java)
+                data?.let {
+                    _userData.postValue(data!!)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+
+        })
     }
 
     suspend fun fetchThread(uid:String) = withContext(Dispatchers.IO) {
@@ -38,10 +53,13 @@ class UserViewModel : ViewModel() {
             val resultList = mutableListOf<ThreadData>()
             threads.orderByChild("uid").equalTo(uid).addValueEventListener(object :ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    println("snapshot "+ snapshot)
                     for (threadSnapShot in snapshot.children){
                        var thread = threadSnapShot.getValue(ThreadData::class.java)
                         resultList.add(thread!!)
                     }
+                    val threadList = resultList // Wait for all user fetches to complete
+                    _threadData.postValue(threadList)
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -49,9 +67,7 @@ class UserViewModel : ViewModel() {
                 }
 
             })
-
-            val threadList = resultList // Wait for all user fetches to complete
-            _threadData.postValue(threadList) // Update LiveData on UI thread
+            // Update LiveData on UI thread
         } catch (e: Exception) {
             Log.e("Firebase", "Error fetching threads: ${e.message}")
         }
