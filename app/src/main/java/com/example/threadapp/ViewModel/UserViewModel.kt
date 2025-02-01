@@ -9,12 +9,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.threadapp.Model.SharedPref
 import com.example.threadapp.Model.ThreadData
 import com.example.threadapp.Model.User
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -31,6 +34,12 @@ class UserViewModel : ViewModel() {
     private var _userData = MutableLiveData<User>()
     var userData: LiveData<User> = _userData
 
+    private var _followerList = MutableLiveData<List<String>>()
+    var followerList: LiveData<List<String>> = _followerList
+
+    private var _followingList = MutableLiveData<List<String>>()
+    var followingList: LiveData<List<String>> = _followingList
+
     fun fetchUser(userId:String){
         users.child(userId).addListenerForSingleValueEvent(object :ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -39,7 +48,6 @@ class UserViewModel : ViewModel() {
                     _userData.postValue(data!!)
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
 
             }
@@ -65,12 +73,36 @@ class UserViewModel : ViewModel() {
                 override fun onCancelled(error: DatabaseError) {
                     TODO("Not yet implemented")
                 }
-
             })
             // Update LiveData on UI thread
         } catch (e: Exception) {
             Log.e("Firebase", "Error fetching threads: ${e.message}")
         }
+    }
+
+    val firestore = Firebase.firestore
+    fun followUser(user_id :String, current_id :String){
+        val followerRef = firestore.collection("Followers").document(user_id)
+        val followingRef = firestore.collection("Followings").document(current_id)
+
+        followerRef.update("followers_id",FieldValue.arrayUnion(current_id))
+        followingRef.update("following_id",FieldValue.arrayUnion(user_id))
+    }
+
+    fun getFollowers(user_id:String){
+          firestore.collection("Followers").document(user_id)
+              .addSnapshotListener { value, error ->
+                  var list = value?.get("followers_id") as?List<String>?: listOf()
+                 _followerList.postValue(list)
+              }
+    }
+
+    fun getFollowing(user_id:String){
+        firestore.collection("Followings").document(user_id)
+            .addSnapshotListener { value, error ->
+                var list = value?.get("following_id") as?List<String>?: listOf()
+                _followingList.postValue(list)
+            }
     }
 
 }

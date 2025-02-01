@@ -36,6 +36,7 @@ class SearchViewModel:ViewModel() {
     }
 
     suspend fun fetchUser() = withContext(Dispatchers.IO) {
+        println("yaha tk aaya")
         try {
             val snapshot = users.get().await() // Fetch threads asynchronously
             val resultList = mutableListOf<User>()
@@ -47,6 +48,7 @@ class SearchViewModel:ViewModel() {
                 }
             }
             val userList = resultList // Wait for all user fetches to complete
+            println("userList "+userList)
             _userData.postValue(userList) // Update LiveData on UI thread
         } catch (e: Exception) {
             Log.e("Firebase", "Error fetching threads: ${e.message}")

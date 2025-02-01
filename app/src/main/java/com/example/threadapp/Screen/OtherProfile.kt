@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.threadapp.ViewModel.AuthViewModel
 import kotlinx.coroutines.delay
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -43,18 +42,17 @@ import coil.request.ImageRequest
 import com.example.threadapp.Model.SharedPref
 import com.example.threadapp.Model.ThreadData
 import com.example.threadapp.Model.User
-import com.example.threadapp.R
 import com.example.threadapp.ViewModel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
- fun OtherProfileScreen(
+fun OtherProfileScreen(
     navController: NavController,
     authViewModel: AuthViewModel,
     userViewModel: UserViewModel,
-    userId:String
+    userId: String
 ) {
-     val allThreads by userViewModel.threadData.observeAsState(emptyList())
+    val allThreads by userViewModel.threadData.observeAsState(emptyList())
     val userData by userViewModel.userData.observeAsState(null)
     LaunchedEffect(true) {
         userId?.let {
@@ -71,7 +69,12 @@ import com.google.firebase.auth.FirebaseAuth
             .background(Color.White)
     ) {
 
-       if(userData!=null) OtherProfileHeader(authViewModel,navController,userData!!)
+        if (userData != null) OtherProfileHeader(
+            authViewModel,
+            navController,
+            userViewModel,
+            userData!!
+        )
 
         Scaffold(
             bottomBar = { myBottomBar(navController) }
@@ -82,8 +85,7 @@ import com.google.firebase.auth.FirebaseAuth
                     .padding(it),
                 contentPadding = PaddingValues(8.dp)
             ) {
-                items(allThreads?: emptyList()) {
-                    thread->
+                items(allThreads ?: emptyList()) { thread ->
                     PostItem(thread)
                 }
             }
@@ -93,12 +95,25 @@ import com.google.firebase.auth.FirebaseAuth
 }
 
 @Composable
-fun OtherProfileHeader(authViewModel: AuthViewModel,
-                  navController:NavController,
-                       user: User
-                       ) {
+fun OtherProfileHeader(
+    authViewModel: AuthViewModel,
+    navController: NavController,
+    userViewModel: UserViewModel,
+    user: User
+) {
     var firebaseUser = authViewModel.firebaseUser.observeAsState()
-     var context = LocalContext.current
+    var context = LocalContext.current
+
+    var currentId = ""
+    if(FirebaseAuth.getInstance().currentUser?.uid!=null){
+        currentId = FirebaseAuth.getInstance().currentUser?.uid!!
+        userViewModel.getFollowers(user.uid.toString())
+        userViewModel.getFollowing(user.uid.toString())
+    }
+
+    val followerList by userViewModel.followerList.observeAsState(emptyList())
+    val followingList by userViewModel.followingList.observeAsState(emptyList())
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -127,7 +142,7 @@ fun OtherProfileHeader(authViewModel: AuthViewModel,
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "500",
+                    text = "${followerList.size}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
@@ -135,7 +150,7 @@ fun OtherProfileHeader(authViewModel: AuthViewModel,
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "250",
+                    text = "${followingList.size}",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
@@ -144,13 +159,15 @@ fun OtherProfileHeader(authViewModel: AuthViewModel,
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Logout Button
         Button(
             onClick = {
-
-               },
+             if(currentId.isNotEmpty()){
+                 userViewModel.followUser(user.uid.toString(),currentId)
+             }
+            },
         ) {
-            Text(text = "Follow", color = Color.White, fontSize = 16.sp)
+            Text(text = if(followerList!= null && followerList.contains(currentId))"following" else "follow"
+                , color = Color.White, fontSize = 16.sp)
         }
     }
 }
@@ -174,7 +191,6 @@ fun OtherPostItem(threadData: ThreadData) {
         )
     }
 }
-
 
 
 /*@Composable

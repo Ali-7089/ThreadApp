@@ -89,11 +89,11 @@ class AuthViewModel : ViewModel() {
         val userObject = User(name, username, email, password, uid,imgUrl)
 
         val db = Firebase.firestore
-        val followers = db.collection("Followers").document(uid!!)
-        val following = db.collection("Following").document(uid!!)
+        val followerRef = db.collection("Followers").document(uid!!)
+        val followingRef = db.collection("Followings").document(uid!!)
 
-        followers.set(mapOf("followings_id" to listOf<String>()))
-        following.set(mapOf("followers_id" to listOf<String>()))
+        followerRef.set(mapOf("followers_id" to listOf<String>()))
+        followingRef.set(mapOf("following_id" to listOf<String>()))
 
         userRef.child(uid!!).setValue(userObject)
             .addOnSuccessListener {

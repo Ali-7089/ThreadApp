@@ -50,7 +50,6 @@ class HomeViewModel:ViewModel() {
                     resultList.add(deferredPair)
                 }
             }
-
             val threadUserList = resultList.awaitAll() // Wait for all user fetches to complete
             _threadAndUser.postValue(threadUserList) // Update LiveData on UI thread
         } catch (e: Exception) {

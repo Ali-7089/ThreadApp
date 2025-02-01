@@ -63,7 +63,6 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage")
     implementation("com.google.firebase:firebase-database")
-
     implementation("io.coil-kt:coil-compose:2.4.0")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
